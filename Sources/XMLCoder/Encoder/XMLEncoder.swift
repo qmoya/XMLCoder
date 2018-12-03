@@ -249,6 +249,9 @@ open class XMLEncoder {
     /// Initializes `self` with default strategies.
     public init() {}
 
+    //	A token indicating that the element is to be treated as character data, that is, raw text.
+    public var characterDataToken: String?
+
     // MARK: - Encoding Values
 
     /// Encodes the given top-level value and returns its XML representation.
@@ -263,6 +266,7 @@ open class XMLEncoder {
             options: options,
             nodeEncodings: []
         )
+        encoder.characterDataToken = characterDataToken
         encoder.nodeEncodings.append(options.nodeEncodingStrategy.nodeEncodings(forType: T.self, with: encoder))
 
         guard let topLevel = try encoder.box_(value) else {
@@ -282,7 +286,7 @@ open class XMLEncoder {
         }
 
         let withCDATA = stringEncodingStrategy != .deferredToString
-        return element.toXMLString(with: header, withCDATA: withCDATA, formatting: outputFormatting).data(using: .utf8, allowLossyConversion: true)!
+        return element.toXMLString(with: header, withCDATA: withCDATA, formatting: outputFormatting, characterDataToken: characterDataToken).data(using: .utf8, allowLossyConversion: true)!
     }
 }
 
@@ -299,6 +303,9 @@ internal class _XMLEncoder: Encoder {
     public var codingPath: [CodingKey]
 
     public var nodeEncodings: [(CodingKey) -> XMLEncoder.NodeEncoding]
+
+    //	A token indicating that the element is to be treated as character data, that is, raw text.
+    public var characterDataToken: String?
 
     /// Contextual user-provided information for use during encoding.
     public var userInfo: [CodingUserInfoKey: Any] {

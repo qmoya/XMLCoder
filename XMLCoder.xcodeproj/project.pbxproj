@@ -23,6 +23,8 @@
 /* Begin PBXBuildFile section */
 		A52C85E221B4669600EF98B7 /* DecodingTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52C85E121B4669600EF98B7 /* DecodingTestCase.swift */; };
 		A52C85E421B4778A00EF98B7 /* CharacterDataDecodingTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52C85E321B4778A00EF98B7 /* CharacterDataDecodingTestCase.swift */; };
+		A5C9BFDF21B56E22005EF839 /* EncodingTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C9BFDD21B56E18005EF839 /* EncodingTestCase.swift */; };
+		A5C9BFE321B56FBC005EF839 /* CharacterDataEncodingTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C9BFE021B56F2D005EF839 /* CharacterDataEncodingTestCase.swift */; };
 		BFE1C59121A4242300EA0458 /* NodeEncodingStrategyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE1C58F21A4232100EA0458 /* NodeEncodingStrategyTests.swift */; };
 		OBJ_35 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
 		OBJ_41 /* XMLCoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_25 /* XMLCoderTests.swift */; };
@@ -61,6 +63,8 @@
 /* Begin PBXFileReference section */
 		A52C85E121B4669600EF98B7 /* DecodingTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecodingTestCase.swift; sourceTree = "<group>"; };
 		A52C85E321B4778A00EF98B7 /* CharacterDataDecodingTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDataDecodingTestCase.swift; sourceTree = "<group>"; };
+		A5C9BFDD21B56E18005EF839 /* EncodingTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodingTestCase.swift; sourceTree = "<group>"; };
+		A5C9BFE021B56F2D005EF839 /* CharacterDataEncodingTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDataEncodingTestCase.swift; sourceTree = "<group>"; };
 		BFE1C58F21A4232100EA0458 /* NodeEncodingStrategyTests.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = NodeEncodingStrategyTests.swift; sourceTree = "<group>"; tabWidth = 4; };
 		D1BCEBCF21943CA6000B550F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1BCEBD021943F09000B550F /* LinuxMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LinuxMain.swift; path = Tests/LinuxMain.swift; sourceTree = "<group>"; };
@@ -133,6 +137,8 @@
 				BFE1C58F21A4232100EA0458 /* NodeEncodingStrategyTests.swift */,
 				A52C85E321B4778A00EF98B7 /* CharacterDataDecodingTestCase.swift */,
 				A52C85E121B4669600EF98B7 /* DecodingTestCase.swift */,
+				A5C9BFDD21B56E18005EF839 /* EncodingTestCase.swift */,
+				A5C9BFE021B56F2D005EF839 /* CharacterDataEncodingTestCase.swift */,
 			);
 			name = XMLCoderTests;
 			path = Tests/XMLCoderTests;
@@ -298,7 +304,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				A5C9BFDF21B56E22005EF839 /* EncodingTestCase.swift in Sources */,
 				OBJ_41 /* XMLCoderTests.swift in Sources */,
+				A5C9BFE321B56FBC005EF839 /* CharacterDataEncodingTestCase.swift in Sources */,
 				BFE1C59121A4242300EA0458 /* NodeEncodingStrategyTests.swift in Sources */,
 				A52C85E421B4778A00EF98B7 /* CharacterDataDecodingTestCase.swift in Sources */,
 				A52C85E221B4669600EF98B7 /* DecodingTestCase.swift in Sources */,

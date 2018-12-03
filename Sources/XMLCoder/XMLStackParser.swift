@@ -60,10 +60,6 @@ internal class _XMLElement {
     var attributes: [String: String] = [:]
     var children: [String: [_XMLElement]] = [:]
 
-    var hasAttributesAndValue: Bool {
-        return attributes.count > 0 && value != nil
-    }
-
     internal init(key: String, value: String? = nil, attributes: [String: String] = [:], children: [String: [_XMLElement]] = [:]) {
         self.key = key
         self.value = value
@@ -203,28 +199,28 @@ internal class _XMLElement {
         return node
     }
 
-    func toXMLString(with header: XMLHeader? = nil, withCDATA cdata: Bool, formatting: XMLEncoder.OutputFormatting, ignoreEscaping _: Bool = false) -> String {
+    func toXMLString(with header: XMLHeader? = nil, withCDATA cdata: Bool, formatting: XMLEncoder.OutputFormatting, ignoreEscaping _: Bool = false, characterDataToken: String? = nil) -> String {
         if let header = header, let headerXML = header.toXML() {
-            return headerXML + _toXMLString(withCDATA: cdata, formatting: formatting)
+            return headerXML + _toXMLString(withCDATA: cdata, formatting: formatting, characterDataToken: characterDataToken)
         }
-        return _toXMLString(withCDATA: cdata, formatting: formatting)
+        return _toXMLString(withCDATA: cdata, formatting: formatting, characterDataToken: characterDataToken)
     }
 
-    fileprivate func formatUnsortedXMLElements(_ string: inout String, _ level: Int, _ cdata: Bool, _ formatting: XMLEncoder.OutputFormatting, _ prettyPrinted: Bool) {
-        formatXMLElements(from: children.map { (key: $0, value: $1) }, into: &string, at: level, cdata: cdata, formatting: formatting, prettyPrinted: prettyPrinted)
+    fileprivate func formatUnsortedXMLElements(_ string: inout String, _ level: Int, _ cdata: Bool, _ formatting: XMLEncoder.OutputFormatting, _ prettyPrinted: Bool, characterDataToken: String?) {
+        formatXMLElements(from: children.map { (key: $0, value: $1) }, into: &string, at: level, cdata: cdata, formatting: formatting, prettyPrinted: prettyPrinted, characterDataToken: characterDataToken)
     }
 
-    fileprivate func elementString(for childElement: (key: String, value: [_XMLElement]), at level: Int, cdata: Bool, formatting: XMLEncoder.OutputFormatting, prettyPrinted: Bool) -> String {
+    fileprivate func elementString(for childElement: (key: String, value: [_XMLElement]), at level: Int, cdata: Bool, formatting: XMLEncoder.OutputFormatting, prettyPrinted: Bool, characterDataToken: String?) -> String {
         var string = ""
         for child in childElement.value {
-            string += child._toXMLString(indented: level + 1, withCDATA: cdata, formatting: formatting)
+            string += child._toXMLString(indented: level + 1, withCDATA: cdata, formatting: formatting, characterDataToken: characterDataToken)
             string += prettyPrinted ? "\n" : ""
         }
         return string
     }
 
-    fileprivate func formatSortedXMLElements(_ string: inout String, _ level: Int, _ cdata: Bool, _ formatting: XMLEncoder.OutputFormatting, _ prettyPrinted: Bool) {
-        formatXMLElements(from: children.sorted { $0.key < $1.key }, into: &string, at: level, cdata: cdata, formatting: formatting, prettyPrinted: prettyPrinted)
+    fileprivate func formatSortedXMLElements(_ string: inout String, _ level: Int, _ cdata: Bool, _ formatting: XMLEncoder.OutputFormatting, _ prettyPrinted: Bool, characterDataToken: String?) {
+        formatXMLElements(from: children.sorted { $0.key < $1.key }, into: &string, at: level, cdata: cdata, formatting: formatting, prettyPrinted: prettyPrinted, characterDataToken: characterDataToken)
     }
 
     fileprivate func attributeString(key: String, value: String) -> String {
@@ -237,9 +233,9 @@ internal class _XMLElement {
         }
     }
 
-    fileprivate func formatXMLElements(from children: [(key: String, value: [_XMLElement])], into string: inout String, at level: Int, cdata: Bool, formatting: XMLEncoder.OutputFormatting, prettyPrinted: Bool) {
+    fileprivate func formatXMLElements(from children: [(key: String, value: [_XMLElement])], into string: inout String, at level: Int, cdata: Bool, formatting: XMLEncoder.OutputFormatting, prettyPrinted: Bool, characterDataToken: String?) {
         for childElement in children {
-            string += elementString(for: childElement, at: level, cdata: cdata, formatting: formatting, prettyPrinted: prettyPrinted)
+            string += elementString(for: childElement, at: level, cdata: cdata, formatting: formatting, prettyPrinted: prettyPrinted, characterDataToken: characterDataToken)
         }
     }
 
@@ -263,24 +259,46 @@ internal class _XMLElement {
         formatUnsortedXMLAttributes(&string)
     }
 
-    fileprivate func formatXMLElements(_ formatting: XMLEncoder.OutputFormatting, _ string: inout String, _ level: Int, _ cdata: Bool, _ prettyPrinted: Bool) {
+    fileprivate func formatXMLElements(_ formatting: XMLEncoder.OutputFormatting, _ string: inout String, _ level: Int, _ cdata: Bool, _ prettyPrinted: Bool, characterDataToken: String?) {
         if #available(macOS 10.13, iOS 11.0, watchOS 4.0, tvOS 11.0, *) {
             if formatting.contains(.sortedKeys) {
-                formatSortedXMLElements(&string, level, cdata, formatting, prettyPrinted)
+                formatSortedXMLElements(&string, level, cdata, formatting, prettyPrinted, characterDataToken: characterDataToken)
                 return
             }
-            formatUnsortedXMLElements(&string, level, cdata, formatting, prettyPrinted)
+            formatUnsortedXMLElements(&string, level, cdata, formatting, prettyPrinted, characterDataToken: characterDataToken)
             return
         }
-        formatUnsortedXMLElements(&string, level, cdata, formatting, prettyPrinted)
+        formatUnsortedXMLElements(&string, level, cdata, formatting, prettyPrinted, characterDataToken: characterDataToken)
     }
 
-    fileprivate func _toXMLString(indented level: Int = 0, withCDATA cdata: Bool, formatting: XMLEncoder.OutputFormatting, ignoreEscaping: Bool = false) -> String {
+    func extractCharacterDataFromChildren(for token: String?) -> String? {
+        guard let tok = token, let child = children[tok], let first = child.first else { return nil }
+        let result = first.value
+        children[tok] = nil
+        return result
+    }
+
+    func extractCharacterDataFromAttributes(for token: String?) -> String? {
+        guard let tok = token else { return nil }
+        let result = attributes[tok]
+        attributes[tok] = nil
+        return result
+    }
+
+    func extractCharacterData(for token: String?) -> String? {
+        if let charData = extractCharacterDataFromAttributes(for: token) {
+            return charData
+        }
+        return extractCharacterDataFromChildren(for: token)
+    }
+
+    fileprivate func _toXMLString(indented level: Int = 0, withCDATA cdata: Bool, formatting: XMLEncoder.OutputFormatting, ignoreEscaping: Bool = false, characterDataToken: String?) -> String {
         let prettyPrinted = formatting.contains(.prettyPrinted)
         let indentation = String(repeating: " ", count: (prettyPrinted ? level : 0) * 4)
         var string = indentation
         string += "<\(key)"
 
+        let charData = extractCharacterData(for: characterDataToken)
         formatXMLAttributes(formatting, &string)
 
         if let value = value {
@@ -291,9 +309,12 @@ internal class _XMLElement {
                 string += "\(value)"
             }
             string += "</\(key)>"
-        } else if !children.isEmpty {
+        } else if !children.isEmpty || charData != nil {
             string += prettyPrinted ? ">\n" : ">"
-            formatXMLElements(formatting, &string, level, cdata, prettyPrinted)
+            if let cd = charData {
+                string += cd
+            }
+            formatXMLElements(formatting, &string, level, cdata, prettyPrinted, characterDataToken: characterDataToken)
 
             string += indentation
             string += "</\(key)>"
