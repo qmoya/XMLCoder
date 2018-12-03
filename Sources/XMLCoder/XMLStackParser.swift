@@ -310,13 +310,15 @@ internal class _XMLElement {
             }
             string += "</\(key)>"
         } else if !children.isEmpty || charData != nil {
-            string += prettyPrinted ? ">\n" : ">"
             if let cd = charData {
-                string += cd
-            }
+				string += ">\(cd)"
+			} else {
+				string += prettyPrinted ? ">\n" : ">"
+			}
             formatXMLElements(formatting, &string, level, cdata, prettyPrinted, characterDataToken: characterDataToken)
-
-            string += indentation
+			if charData == nil {
+				string += indentation
+			}
             string += "</\(key)>"
         } else {
             string += " />"
